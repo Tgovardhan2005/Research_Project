@@ -1,36 +1,49 @@
-# 🌱 Multimodal Plant Disease Prediction at the Edge
+# Multimodal Plant Disease Prediction at the Edge
 
-Overcoming Context Blindness and Connectivity Constraints in Rural Agriculture
+An offline, context-aware AI ecosystem for connectivity-constrained rural agriculture. This project deploys an edge-optimized hybrid architecture that fuses a nano-scale vision model with a meteorological logic gate to eliminate false positives in plant disease diagnosis.
 
-## 📌 Project Overview
+## Overview
 
-This repository contains the architecture and implementation of Offline, Context-Aware Diagnostic Ecosystem for smallholder farmers.
+Current agricultural AI diagnostic tools fail in rural environments due to a heavy reliance on cloud connectivity and a critical lack of environmental context. While state-of-the-art vision models excel in laboratory settings, they suffer from severe domain shift in the field and ignore crucial epidemiological triggers like temperature and humidity. 
 
-Standard agricultural AI models fail in rural deployment due to the "Reality Gap": they require high-speed internet, assume perfect photography, and ignore local weather context. This project solves these constraints by shifting inference entirely to the Edge and utilizing asynchronous SMS telemetry for environmental awareness.
+This project solves this by operating entirely offline on sub-$50 Android devices via a Progressive Web App (PWA). It uses a heavily quantized YOLOv8-Nano model for visual extraction and a Multi-Layer Perceptron (MLP) to cross-reference visual symptoms against locally cached weather data.
 
-## 🚀 Key Innovations
+## Key Features
 
-- **Active UX Gating (MediaPipe):** An active shutter lock prevents "Garbage-In, Garbage-Out" (GIGO) by evaluating image focus and lighting in real-time before the capture.
-- **Mixed-Symptom Segmentation (YOLOv8-seg):** Isolates multiple co-occurring stress factors on a single leaf to prevent background bias.
-- **SMS Micro-Climate Matrix:** A zero-internet telemetry payload that delivers 7-day hexadecimal-encoded weather matrices over standard 2G/GSM networks to local device storage.
-- **Contradiction Score Network (CSN) & HITL:** An Explainable AI (XAI) circuit breaker that cross-references visual symptoms with offline weather data. If a paradox is detected (e.g., fungal prediction during a drought), it triggers a Human-in-the-Loop (HITL) prompt for validation.
-- **Accessible PWA:** Voice UI and icon-driven output deployed via a lightweight Progressive Web App for rural users with low literacy.
+* **Offline-First Execution:** Runs entirely in the browser using TensorFlow.js and local IndexedDB caching, requiring zero active internet connection in the field.
+* **Active Quality-Gating:** Utilizes real-time MediaPipe tracking to lock the camera shutter until image focus, luminance, and leaf alignment meet strict diagnostic standards.
+* **Edge-Optimized Vision:** Powered by a YOLOv8-Nano INT8 quantized model, compressed to just 1.54 MB while retaining a 91.2% Top-5 accuracy.
+* **Contradiction Score Network (CSN):** A late-fusion MLP that acts as a biological logic gate, preventing false positives by catching conflicts between visual AI predictions and cached micro-climate data (temperature, humidity) or soil types.
+* **Accessible Voice UI:** Features a simple, icon-driven interface with native text-to-speech voice support designed for low-literacy users.
 
-## 🧠 System Architecture
+## System Architecture
 
-The pipeline consists of four localized stages:
+The inference pipeline is segmented into three sequential gating stages to guarantee accuracy in uncontrolled field environments:
 
-1. **Quality Gate:** MediaPipe (Focus/Lighting validation).
-2. **Vision Branch:** YOLOv8-seg (Isolation) -> EfficientNet-B0 (Visual Feature Vector).
-3. **Context Branch:** Intercepted SMS Matrix -> Local SQLite/IndexedDB -> MLP (Environmental Feature Vector).
-4. **Late Fusion & CSN:** Concatenated Multi-modal Tensor -> Paradox Detection -> Voice UI Output.
+1. **Spatial Gating:** A pre-processing YOLO detection instance scans the camera feed to isolate the target leaf and mathematically mask out overlapping healthy plants and background dirt.
+2. **Feature Extraction:** The cropped tensor is processed by the YOLOv8-Nano engine to output a raw probability distribution vector across a 28-class agricultural vocabulary.
+3. **Meteorological Contradiction Scoring:** The YOLO prediction, user inputs (plant/soil type), and cached weather data are fed into the MLP. The MLP calculates a contradiction scalar (0.0 to 1.0). High scores suppress biologically impossible predictions and prompt the user to recapture the image.
 
-## 🛠️ Tech Stack
+## Technology Stack
 
-- **Frontend / Edge:** Progressive Web App (PWA), React.js, TensorFlow.js / TFLite
-- **Computer Vision:** Ultralytics YOLOv8-seg, MediaPipe (Face/Objectron logic adapted for leaves), EfficientNet-B0
-- **Backend (Telemetry Sender):** Node.js / Python Flask, Twilio/GSM Gateway (for SMS dispatch), Open-Meteo API
-- **Data Storage:** IndexedDB (Local PWA storage)
+* **Machine Learning Training:** Python, PyTorch, Ultralytics (YOLOv8)
+* **Model Export & Edge Inference:** TensorFlow Lite (INT8 Quantization), TensorFlow.js
+* **Frontend Application:** HTML, CSS, JavaScript (Progressive Web App)
+* **Pre-processing:** MediaPipe (Web)
+* **Local Storage:** IndexedDB (Service Workers for cache-first weather sync)
+
+## Installation & Local Development
+
+1. Clone the repository to your local machine.
+2. Ensure you have a local web server installed (e.g., VS Code Live Server or Python's `http.server`) to bypass browser CORS restrictions for local module loading.
+3. Serve the project directory locally.
+4. Navigate to the `localhost` URL provided by your server in any modern web browser.
+
+## Performance Metrics
+
+* **Model Payload:** 1.54 MB (`.tflite` format)
+* **Top-1 Accuracy (INT8):** 63.9% (Raw visual extraction)
+* **Top-5 Accuracy (INT8):** 91.2% (Diagnostic baseline passed to the CSN)
 
 ## 📖 Documentation
 
