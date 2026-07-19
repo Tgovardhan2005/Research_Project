@@ -39,3 +39,5 @@ Please refer to the following documents for deep technical context:
 - `PROBLEM_STATEMENT.md` - The "Reality Gap" and architectural solutions.
 - `DOMAIN_DOCUMENT.md` - Background research on Multimodal Fusion and Edge AI in agriculture.
 - `RESEARCH_GAP.md` - Analysis of SOTA academic research versus rural agricultural realities.
+- `LITERATURE_REVIEW.md` - Evolution of Agricultural Diagnostic AI and validation of core architectures (2024-2026).
+- `METHODOLOGY.md` - System Pipeline & Edge Implementation.
