@@ -38,3 +38,4 @@ Please refer to the following documents for deep technical context:
 
 - `PROBLEM_STATEMENT.md` - The "Reality Gap" and architectural solutions.
 - `DOMAIN_DOCUMENT.md` - Background research on Multimodal Fusion and Edge AI in agriculture.
+- `RESEARCH_GAP.md` - Analysis of SOTA academic research versus rural agricultural realities.

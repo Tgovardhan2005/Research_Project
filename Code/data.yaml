@@ -1,0 +1,36 @@
+# Updated data.yaml for Plant Disease Detection
+train: /root/.cache/kagglehub/datasets/nirmalsankalana/plantdoc-yolo-26-dataset/versions/2/yolo_dataset/train/images
+val: /root/.cache/kagglehub/datasets/nirmalsankalana/plantdoc-yolo-26-dataset/versions/2/yolo_dataset/val/images
+
+nc: 29
+names: [
+    'Apple___healthy',                # 0
+    'Apple___rust',                   # 1
+    'Apple___scab',                   # 2
+    'Bell_pepper___bacterial_spot',   # 3
+    'Bell_pepper___healthy',          # 4
+    'Blueberry___healthy',            # 5
+    'Cherry___healthy',               # 6
+    'Corn___common_rust',             # 7
+    'Corn___gray_leaf_spot',          # 8
+    'Corn___northern_leaf_blight',    # 9
+    'Grape___black_rot',              # 10
+    'Grape___healthy',                # 11
+    'Peach___healthy',                # 12
+    'Potato___early_blight',          # 13
+    'Potato___healthy',               # 14
+    'Potato___late_blight',           # 15
+    'Raspberry___healthy',            # 16
+    'Soybean___healthy',              # 17
+    'Squash___powdery_mildew',        # 18
+    'Strawberry___healthy',           # 19
+    'Tomato___bacterial_spot',        # 20
+    'Tomato___early_blight',          # 21
+    'Tomato___healthy',               # 22
+    'Tomato___late_blight',           # 23
+    'Tomato___leaf_curl',             # 24
+    'Tomato___leaf_mold',             # 25
+    'Tomato___mosaic_virus',          # 26
+    'Tomato___septoria_leaf_spot',    # 27
+    'Tomato___spider_mites'           # 28
+]
