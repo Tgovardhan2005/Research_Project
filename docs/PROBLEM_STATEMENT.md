@@ -1,10 +1,24 @@
-# Problem Statement: The "Reality Gap" in Agricultural AI
+# 🎯 Problem Statement & Objectives
 
-Current agricultural AI diagnostic tools fail in rural environments due to a heavy reliance on cloud connectivity and a critical lack of environmental context. While state-of-the-art vision models excel in laboratory settings, they suffer from severe domain shift in the field and ignore crucial epidemiological triggers like temperature and humidity. This project proposes an offline-first, edge-optimized architecture that fuses a highly quantized YOLOv8-Nano vision engine (1.54 MB) with a Multi-Layer Perceptron logic gate to cross-reference visual symptoms against locally cached weather data, ensuring robust, paradox-free diagnoses on sub-$50 Android devices.
+Despite significant advancements in computer vision, deploying highly accurate plant disease diagnostics to rural agricultural environments remains an unsolved challenge. Existing solutions face critical bottlenecks in processing unconstrained field data and executing on low-power hardware.
 
-Despite the proliferation of Deep Learning (DL) in agricultural diagnostics, existing models suffer from this massive "Reality Gap"—a systemic failure to account for the constraints of smallholder farming in developing regions. Current State-of-the-Art (SOTA) research exhibits four critical points of failure when deployed in the field:
+---
 
-* **The GIGO (Garbage-In, Garbage-Out) Trap:** Existing architectures assume high-quality, professional-grade imagery. They fail to reject the blurry, low-light, or off-center photos typically captured by rural users, resulting in high false-positive rates. Our system addresses this by implementing an active camera shutter lock, which leverages real-time MediaPipe heuristics to enforce scientific capture standards before inference.
-* **The Single-Label Fallacy:** Current SOTA models rely on static classification, which fails to account for mixed symptoms—such as co-occurring nutrient deficiencies and early-stage fungal blights. We resolve this by utilizing YOLOv8-seg, which enables instance segmentation to isolate and categorize multiple distinct stress factors on a single leaf.
-* **The Connectivity Void:** Existing multimodal models require constant, high-speed 5G/4G connectivity to fetch real-time weather APIs. We bridge this gap through a "Cache-First" hybrid architecture, which performs opportunistic background syncing of meteorological data when connectivity is available, storing it locally to guarantee zero-latency offline environmental context.
-* **The Trustworthiness/Black-Box Problem:** Most models output a single, deterministic diagnosis. Without explainable validation, they cannot distinguish between abiotic stress (e.g., heat scorch) and biotic disease (e.g., fungal blight), leading to wasted resources. We implement a rule-based Contradiction Score Network (CSN) that cross-references visual symptoms against pathogen-specific epidemiological time-windows to flag paradoxical diagnoses for the user.
+## 1. The Core Problems
+
+- **Context Blindness in the Wild:** Standard deep learning models are primarily trained on lab-curated images (e.g., PlantVillage). When deployed "in-the-wild," these networks suffer severe accuracy drops because they cannot mathematically separate the biological leaf tissue from complex background clutter (soil, weeds, shadows, and overlapping healthy leaves).
+- **Micro-Lesion Feature Degradation:** Standard mobile object detection architectures (like base YOLOv8) aggressively downsample input images to standard 640x640 resolutions. This process destroys the pixel geometry of microscopic, early-stage fungal lesions, rendering them invisible to the deep convolutional layers.
+- **Long-Tail Data Starvation:** Real-world agricultural datasets (e.g., PlantDoc) are naturally imbalanced. While common diseases have thousands of images, rare but destructive strains suffer from "data starvation." Standard multi-class training algorithms fail to converge on these minority classes, leading to catastrophic misdiagnoses for severe infections.
+- **The Cloud-Dependency Bottleneck:** State-of-the-art attention-based networks typically run in 32-bit floating-point (FP32) formats on high-end cloud GPUs. Because rural farms lack reliable, high-speed internet infrastructure, cloud-dependent diagnostic tools become entirely inaccessible to the farmers who need them most.
+
+---
+
+## 2. Project Objectives
+
+To bridge the gap between academic AI and practical agricultural application, this project engineered a localized, edge-optimized object detection pipeline. The core objectives were:
+
+- **Engineer a Hardware-Bound Architecture:** Build a high-precision object detection model that strictly adheres to the computational limits of low-end mobile CPUs, eliminating all reliance on cloud-based API calls.
+- **Implement Dual-Domain Attention:** Solve context blindness by injecting a Convolutional Block Attention Module (CBAM) into an ultra-lightweight backbone, forcing the network to dynamically filter out background soil and lock onto lesion boundaries.
+- **Preserve High-Frequency Geometry:** Configure the input pipeline to ingest 800x800 spatial resolutions, ensuring microscopic disease patterns survive the pooling layers of the network.
+- **Resolve Minority Class Failure:** Engineer a mathematical Super-Class grouping strategy that aggregates visually and biologically similar strains, ensuring deep feature convergence and eliminating data starvation without artificial image generation.
+- **Optimize for Edge Deployment:** Compress the finalized architecture using Post-Training Quantization (INT8), dramatically shrinking the memory footprint and enabling real-time, zero-latency execution directly on a smartphone.

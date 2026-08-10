@@ -1,59 +1,60 @@
-# ⚙️ Methodology: System Pipeline & Edge Implementation
+# ⚙️ Methodology & System Pipeline
 
-The methodology of this project adopts a Modular Systems Engineering Pipeline. By decoupling environmental data acquisition from real-time inference, the system maintains high performance in "data desert" environments. The pipeline processes data through five distinct, localized stages.
+The methodology of this project abandons standard image classification in favor of an Edge-Optimized, Attention-Driven Object Detection pipeline. To overcome the chaotic nature of in-the-wild agricultural imagery and hardware constraints, the system processes data through six distinct, localized stages.
 
-## 1. Phase 1: Pre-Inference Quality Gating (MediaPipe)
+---
 
-To solve the "Garbage-In, Garbage-Out" (GIGO) problem at the source:
+## Phase 1: High-Resolution Input Processing
 
-**Real-time Heuristics:** The camera viewfinder initializes a lightweight MediaPipe landmark loop.
+Standard mobile detection models typically downsample images to 640x640, which frequently destroys the pixel geometry of microscopic, early-stage fungal lesions.
 
-**Validation Criteria:** The algorithm evaluates frames for Laplacian variance (blur detection) and pixel luminance (lighting).
+- **Action:** The system captures the camera feed and processes the input at a scaled 800x800 spatial resolution.
+- **Purpose:** This explicitly preserves high-frequency textural details of tiny disease spots, allowing them to survive the pooling layers of the deep neural network.
 
-**Active Gating:** The capture button remains locked until thresholds are met. Real-time UI overlays guide the user (e.g., "Too dark", "Move closer"). The heavy diagnostic AI is only triggered once a scientifically viable image is captured.
+---
 
-## 2. Phase 2: Intelligent Pre-Processing (YOLOv8-seg)
+## Phase 2: Lightweight Feature Extraction (YOLOv8-Nano)
 
-To eliminate background noise and isolate the plant tissue:
+Instead of utilizing massive, battery-draining architectures, the image enters an ultra-lightweight feature extractor.
 
-**Instance Segmentation:** Validated images are passed to a quantized YOLOv8-seg model. As highlighted in recent 2024-2026 studies, YOLOv8 leverages a C2f module in its backbone, which allows for "richer gradient flow" to capture intricate details like microscopic leaf lesions significantly better than standard CNNs.
+- The input is passed through the Cross Stage Partial (C2f) bottleneck layers of a YOLOv8-Nano backbone.
+- The backbone aggressively extracts foundational geometric features (edges, color gradients, and structural shapes) while maintaining an exceptionally low parameter count to ensure future edge compatibility.
 
-**Tissue Isolation:** The model segments the leaf from the background (soil, shadows, hands).
+---
 
-**Multi-Stress Bounding:** If multiple co-occurring stress factors exist (e.g., a necrotic spot and a chlorotic halo), YOLOv8 segments them as distinct Regions of Interest (ROIs).
+## Phase 3: Attentional Noise Filtering (CBAM Injection)
 
-## 3. Phase 3: Cache-First Environmental Context
+To solve the issue of "Context Blindness" (where models confuse background soil or weeds with plant diseases), the pipeline interrupts the standard YOLOv8 flow:
 
-To provide accurate climate data without requiring active internet in the field:
+- The extracted feature maps are passed into a custom-injected Convolutional Block Attention Module (CBAM) positioned at Layer 10 (post-SPPF).
+- **Channel Attention:** Computes "what" is important, locking onto the specific color and textural frequencies of biological decay.
+- **Spatial Attention:** Computes "where" the target is, creating a mathematical mask that actively suppresses background dirt, shadows, and overlapping healthy leaves.
 
-**Opportunistic Syncing:** The PWA uses Service Workers to silently fetch weather data from Open-Meteo whenever the device detects intermittent connectivity.
+---
 
-**Storage Layer:** Weather variables (Temperature, Humidity, VPD) are serialized into a 7-day matrix and stored in the device's local IndexedDB.
+## Phase 4: Super-Class Bounding Box Regression
 
-**Offline Retrieval:** When offline in the field, the app queries this local cache, ensuring the system has the most recent climate history without API calls.
+The attention-filtered data enters the detection head for localization and classification.
 
-## 4. Phase 4: Multimodal Late Fusion
+- To prevent the model from failing on minority classes due to long-tail data starvation, the detection head utilizes a mathematically grouped 18 Super-Class structure.
+- By algorithmically mapping biologically similar strains into cohesive crop-level categories (e.g., aggregating 7 distinct tomato infections into a singular `Tomato_Diseased` class), the network guarantees mathematical convergence and localized bounding box prediction with extreme confidence.
 
-Combining biological visuals with environmental reality:
+---
 
-**Vision Backbone:** Segmented leaf ROIs pass through a quantized EfficientNet-B0 to generate a 512-D visual feature vector.
+## Phase 5: Edge Compression (INT8 Quantization)
 
-**Environmental Branch:** The cached weather matrix passes through a Multi-Layer Perceptron (MLP) to generate a 64-D environmental feature vector. Drawing on 2025 research from Midocean University, this late-fusion approach using an MLP is a proven, lightweight method for merging structured environmental data with visual embeddings on budget hardware, yielding near perfect precision compared to unimodal models.
+Because the target environment (rural farms) lacks reliable internet infrastructure, the model must be completely severed from the cloud.
 
-**Synergistic Concatenation:** These vectors are mathematically concatenated into a unified diagnostic tensor before the final classification head.
+- The finalized PyTorch (`.pt`) weights are subjected to Post-Training Quantization via TensorFlow Lite.
+- The network's 32-bit floating-point (FP32) weights are mathematically compressed into 8-bit integers (INT8).
+- This shrinks the model's memory footprint by roughly 75%, allowing the sophisticated CBAM-augmented architecture to execute locally on a smartphone CPU/NPU with zero latency.
 
-## 5. Phase 5: Explainable Validation (CSN & HITL)
+---
 
-Ensuring diagnostic transparency and trust:
+## Phase 6: Accessible Human-Computer Interaction (HCI)
 
-**Contradiction Score Network (CSN):** A logic-based layer that calculates the dissonance between visual predictions and climate reality (e.g., Visual: Fungal Pathogen; Environment: Extended Drought).
+The final mathematical outputs are translated into an actionable, user-friendly interface:
 
-**HITL Circuit Breaker:** If the CSN detects a paradox, the system pauses classification and triggers an Human-in-the-Loop (HITL) prompt, asking the farmer for binary physical ground-truth (e.g., "Is the plant under a greenhouse?").
+- **Visual Localization:** The UI renders precise bounding boxes directly over the live camera feed, physically proving to the user which specific leaf spots triggered the diagnosis.
+- **Literacy Bypass:** The final diagnosis and treatment prescriptions are synthesized into the local regional dialect using native browser Text-to-Speech (TTS) APIs, ensuring the system is highly accessible to non-technical or illiterate farming communities.
 
-**Final Recalibration:** Farmer input overrides the visual bias, correcting the diagnosis from pathogen to abiotic stress.
-
-## 6. Phase 6: Accessible Output
-
-**Voice Synthesis:** Validated diagnoses and treatment steps are synthesized into local dialects using Web Speech APIs.
-
-**Iconographic Treatment:** Actionable steps are presented through standardized iconography, completely bypassing literacy-based barriers.
