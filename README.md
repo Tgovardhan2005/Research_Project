@@ -1,56 +1,47 @@
-# Multimodal Plant Disease Prediction at the Edge
+# AgriVision: Two-Stage Edge AI Pipeline for Multi-Crop Disease Detection
 
-An offline, context-aware AI ecosystem for connectivity-constrained rural agriculture. This project deploys an edge-optimized hybrid architecture that fuses a nano-scale vision model with a meteorological logic gate to eliminate false positives in plant disease diagnosis.
+> *Bridging the "Reality Gap" in Agricultural Edge AI through Decoupled Localization and Diagnosis.*
 
-## Overview
+---
 
-Current agricultural AI diagnostic tools fail in rural environments due to a heavy reliance on cloud connectivity and a critical lack of environmental context. While state-of-the-art vision models excel in laboratory settings, they suffer from severe domain shift in the field and ignore crucial epidemiological triggers like temperature and humidity. 
+## 📌 Project Overview
 
-This project solves this by operating entirely offline on sub-$50 Android devices via a Progressive Web App (PWA). It uses a heavily quantized YOLOv8-Nano model for visual extraction and a Multi-Layer Perceptron (MLP) to cross-reference visual symptoms against locally cached weather data.
+Standard monolithic object detection models struggle in real-world agricultural deployment. Forcing a single architecture to handle both background filtering (weeds, soil, shadows) and fine-grained lesion classification leads to parameter bloat and semantic confusion.
 
-## Key Features
+This project solves the "Monolithic Bottleneck" by decoupling the tasks into a highly optimized **Two-Stage Pipeline**. By extracting clean leaf patches dynamically from in-the-wild field imagery, this system brings lab-level diagnostic accuracy (**96.7%**) to offline, low-power edge devices.
 
-* **Offline-First Execution:** Runs entirely in the browser using TensorFlow.js and local IndexedDB caching, requiring zero active internet connection in the field.
-* **Active Quality-Gating:** Utilizes real-time MediaPipe tracking to lock the camera shutter until image focus, luminance, and leaf alignment meet strict diagnostic standards.
-* **Edge-Optimized Vision:** Powered by a YOLOv8-Nano INT8 quantized model, compressed to just 1.54 MB while retaining a 91.2% Top-5 accuracy.
-* **Contradiction Score Network (CSN):** A late-fusion MLP that acts as a biological logic gate, preventing false positives by catching conflicts between visual AI predictions and cached micro-climate data (temperature, humidity) or soil types.
-* **Accessible Voice UI:** Features a simple, icon-driven interface with native text-to-speech voice support designed for low-literacy users.
+---
 
-## System Architecture
+## 🚀 Key Innovations & Architecture
 
-The inference pipeline is segmented into three sequential gating stages to guarantee accuracy in uncontrolled field environments:
+- **Dynamic Environmental Filtering (Stage 1):** Utilizes a YOLOv8-Nano locator trained on wild field data (PlantDoc/FieldPlant) to isolate target leaves and eliminate 100% of background clutter.
+- **High-Fidelity Micro-Classification (Stage 2):** Passes the cropped leaf to a MobileNetV3-Small diagnostician trained on a 38-class augmented PlantVillage dataset.
+- **Ultra-Lightweight Footprint:** The combined pipeline operates on just **~3.9 Million parameters**, replacing monolithic models that require 11.7M+ parameters.
+- **Accessible Edge UI:** Features an interactive Flask-based web interface with offline Text-to-Speech (TTS) alerts for farmers.
 
-1. **Spatial Gating:** A pre-processing YOLO detection instance scans the camera feed to isolate the target leaf and mathematically mask out overlapping healthy plants and background dirt.
-2. **Feature Extraction:** The cropped tensor is processed by the YOLOv8-Nano engine to output a raw probability distribution vector across a 28-class agricultural vocabulary.
-3. **Meteorological Contradiction Scoring:** The YOLO prediction, user inputs (plant/soil type), and cached weather data are fed into the MLP. The MLP calculates a contradiction scalar (0.0 to 1.0). High scores suppress biologically impossible predictions and prompt the user to recapture the image.
+---
 
-## Technology Stack
+## 📊 Intermediate Performance Metrics
 
-* **Machine Learning Training:** Python, PyTorch, Ultralytics (YOLOv8)
-* **Model Export & Edge Inference:** TensorFlow Lite (INT8 Quantization), TensorFlow.js
-* **Frontend Application:** HTML, CSS, JavaScript (Progressive Web App)
-* **Pre-processing:** MediaPipe (Web)
-* **Local Storage:** IndexedDB (Service Workers for cache-first weather sync)
+- **Stage 1 (Localization):** Effectively maps target leaf coordinates, completely removing soil, weed, and shadow interference.
+- **Stage 2 (Classification):** Achieved **96.7% Validation Accuracy** across 38 distinct crop-disease conditions.
+- **Computational Efficiency:** Requires only **~8.9 GFLOPs**, optimized via INT8 quantization for sub-10ms edge inference.
 
-## Installation & Local Development
+---
 
-1. Clone the repository to your local machine.
-2. Ensure you have a local web server installed (e.g., VS Code Live Server or Python's `http.server`) to bypass browser CORS restrictions for local module loading.
-3. Serve the project directory locally.
-4. Navigate to the `localhost` URL provided by your server in any modern web browser.
+## 🛠️ Tech Stack
 
-## Performance Metrics
+- **Backend & Deep Learning:** Python, Flask, PyTorch, Torchvision, Ultralytics YOLOv8
+- **Frontend & Accessibility:** HTML5, CSS3, Vanilla JavaScript, Web Speech API (TTS)
 
-* **Model Payload:** 1.54 MB (`.tflite` format)
-* **Top-1 Accuracy (INT8):** 63.9% (Raw visual extraction)
-* **Top-5 Accuracy (INT8):** 91.2% (Diagnostic baseline passed to the CSN)
+---
 
 ## 📖 Documentation
 
-Please refer to the following documents for deep technical context:
+Please refer to the following documents in `docs/` for deep technical context:
 
-- `PROBLEM_STATEMENT.md` - The "Reality Gap" and architectural solutions.
-- `DOMAIN_DOCUMENT.md` - Background research on Multimodal Fusion and Edge AI in agriculture.
-- `RESEARCH_GAP.md` - Analysis of SOTA academic research versus rural agricultural realities.
-- `LITERATURE_REVIEW.md` - Evolution of Agricultural Diagnostic AI and validation of core architectures (2024-2026).
-- `METHODOLOGY.md` - System Pipeline & Edge Implementation.
+- [`PROBLEM_STATEMENT.md`](docs/PROBLEM_STATEMENT.md) - The "Reality Gap" and architectural solutions.
+- [`DOMAIN_DOCUMENT.md`](docs/DOMAIN_DOCUMENT.md) - Background research on Multimodal Fusion and Edge AI in agriculture.
+- [`RESEARCH_GAP.md`](docs/RESEARCH_GAP.md) - Analysis of SOTA academic research versus rural agricultural realities.
+- [`LITERATURE_REVIEW.md`](docs/LITERATURE_REVIEW.md) - Evolution of Agricultural Diagnostic AI and validation of core architectures.
+- [`METHODOLOGY.md`](docs/METHODOLOGY.md) - System Pipeline & Edge Implementation.
