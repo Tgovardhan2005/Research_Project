@@ -1,47 +1,126 @@
-# AgriVision: Two-Stage Edge AI Pipeline for Multi-Crop Disease Detection
+# PlantDoc Edge
 
-> *Bridging the "Reality Gap" in Agricultural Edge AI through Decoupled Localization and Diagnosis.*
+An edge-oriented plant leaf analysis system that combines YOLO leaf
+localization with EfficientNet-B0 classification.
 
----
+## Pipeline
 
-## 📌 Project Overview
+Input image
+    |
+    v
+YOLO leaf localization
+    |
+    v
+Highest-confidence bounding box
+    |
+    v
+Crop and resize to 224 x 224 RGB
+    |
+    v
+ImageNet normalization
+    |
+    v
+EfficientNet-B0 classifier
+    |
+    v
+One of 27 class predictions
 
-Standard monolithic object detection models struggle in real-world agricultural deployment. Forcing a single architecture to handle both background filtering (weeds, soil, shadows) and fine-grained lesion classification leads to parameter bloat and semantic confusion.
+## Project structure
 
-This project solves the "Monolithic Bottleneck" by decoupling the tasks into a highly optimized **Two-Stage Pipeline**. By extracting clean leaf patches dynamically from in-the-wild field imagery, this system brings lab-level diagnostic accuracy (**96.7%**) to offline, low-power edge devices.
+- `training/01_train_yolo_detector.py`: YOLO detector training
+- `training/02_train_efficientnet_b0.py`: EfficientNet-B0 training
+- `training/03_evaluate_pipeline.py`: End-to-end evaluation
+- `training/04_export_onnx_fp16.py`: ONNX FP32 and FP16 export
+- `training/05_gradcam_explainability.py`: Grad-CAM visualization
+- `configs/class_order.json`: The 27-class label order
+- `configs/data.yaml`: YOLO dataset configuration
+- `webapp/`: Flask inference application and user interface
 
----
+## Installation
 
-## 🚀 Key Innovations & Architecture
+```bash
+python -m venv .venv
+```
 
-- **Dynamic Environmental Filtering (Stage 1):** Utilizes a YOLOv8-Nano locator trained on wild field data (PlantDoc/FieldPlant) to isolate target leaves and eliminate 100% of background clutter.
-- **High-Fidelity Micro-Classification (Stage 2):** Passes the cropped leaf to a MobileNetV3-Small diagnostician trained on a 38-class augmented PlantVillage dataset.
-- **Ultra-Lightweight Footprint:** The combined pipeline operates on just **~3.9 Million parameters**, replacing monolithic models that require 11.7M+ parameters.
-- **Accessible Edge UI:** Features an interactive Flask-based web interface with offline Text-to-Speech (TTS) alerts for farmers.
+Windows:
 
----
+```cmd
+.venv\Scripts\activate
+```
 
-## 📊 Intermediate Performance Metrics
+Install dependencies:
 
-- **Stage 1 (Localization):** Effectively maps target leaf coordinates, completely removing soil, weed, and shadow interference.
-- **Stage 2 (Classification):** Achieved **96.7% Validation Accuracy** across 38 distinct crop-disease conditions.
-- **Computational Efficiency:** Requires only **~8.9 GFLOPs**, optimized via INT8 quantization for sub-10ms edge inference.
+```bash
+pip install -r requirements.txt
+```
 
----
+## Dataset preparation
 
-## 🛠️ Tech Stack
+Prepare the annotated YOLO dataset with train, validation, and test splits.
 
-- **Backend & Deep Learning:** Python, Flask, PyTorch, Torchvision, Ultralytics YOLOv8
-- **Frontend & Accessibility:** HTML5, CSS3, Vanilla JavaScript, Web Speech API (TTS)
+Prepare the classification dataset with one directory per class.
 
----
+Keep the classification label order consistent with `configs/class_order.json`.
 
-## 📖 Documentation
+Do not use the same images for training and independent testing.
 
-Please refer to the following documents in `docs/` for deep technical context:
+## Training
 
-- [`PROBLEM_STATEMENT.md`](docs/PROBLEM_STATEMENT.md) - The "Reality Gap" and architectural solutions.
-- [`DOMAIN_DOCUMENT.md`](docs/DOMAIN_DOCUMENT.md) - Background research on Multimodal Fusion and Edge AI in agriculture.
-- [`RESEARCH_GAP.md`](docs/RESEARCH_GAP.md) - Analysis of SOTA academic research versus rural agricultural realities.
-- [`LITERATURE_REVIEW.md`](docs/LITERATURE_REVIEW.md) - Evolution of Agricultural Diagnostic AI and validation of core architectures.
-- [`METHODOLOGY.md`](docs/METHODOLOGY.md) - System Pipeline & Edge Implementation.
+Train the detector:
+
+```bash
+python training/01_train_yolo_detector.py
+```
+
+Train the classifier:
+
+```bash
+python training/02_train_efficientnet_b0.py
+```
+
+Evaluate the pipeline:
+
+```bash
+python training/03_evaluate_pipeline.py
+```
+
+Export ONNX models:
+
+```bash
+python training/04_export_onnx_fp16.py
+```
+
+Generate Grad-CAM:
+
+```bash
+python training/05_gradcam_explainability.py
+```
+
+## Evaluation configuration
+
+The final deployment pipeline uses:
+
+- YOLO input size: 640
+- YOLO confidence threshold: 0.25
+- Bounding box: highest-confidence detection
+- Classifier input: 224 x 224 RGB
+- Classifier: EfficientNet-B0
+- Class count: 27
+- Deployment classifier: FP16-weight ONNX
+
+The project validation results previously recorded were approximately 71.76% end-to-end accuracy and 71.11% macro-F1 on 262 validation images. These are project validation results, not an independent external benchmark or a guarantee that a newly trained model will reproduce them.
+
+## Limitations
+
+- The classifier does not have a dedicated healthy-leaf class in its current 27-class label set.
+- Confidence thresholds alone cannot guarantee rejection of unrelated images.
+- Edge-device latency and power consumption require measurements on actual target hardware.
+- The provided training scripts are reusable implementations and may require adjustment to reproduce the original experiment exactly.
+
+## Model files
+
+Large model weights and datasets are not committed to this repository. Provide separate download instructions for authorized model artifacts.
+
+## License
+
+Add the license appropriate for your code and datasets before publishing.

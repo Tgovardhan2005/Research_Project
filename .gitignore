@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Training outputs
+runs/
+outputs/
+checkpoints/
+wandb/
+
+# Datasets
+datasets/
+data/
+*.zip
+
+# Model weights and large artifacts
+*.pt
+*.pth
+*.onnx
+*.tflite
+
+# Local development
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log

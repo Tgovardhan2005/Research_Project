@@ -1,0 +1,8 @@
+path: ../datasets/leaf_detection
+
+train: train/images
+val: valid/images
+test: test/images
+
+names:
+  0: leaf

@@ -1,0 +1,15 @@
+ultralytics
+torch
+torchvision
+numpy
+pandas
+Pillow
+scikit-learn
+matplotlib
+seaborn
+onnx
+onnxruntime
+onnxconverter-common
+opencv-python
+Flask
+python-dotenv
