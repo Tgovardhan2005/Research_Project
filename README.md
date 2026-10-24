@@ -1,126 +1,272 @@
-# PlantDoc Edge
 
-An edge-oriented plant leaf analysis system that combines YOLO leaf
-localization with EfficientNet-B0 classification.
+<div align="center">
 
-## Pipeline
+# 🌿 PlantDoc Edge
 
-Input image
-    |
-    v
-YOLO leaf localization
-    |
-    v
-Highest-confidence bounding box
-    |
-    v
-Crop and resize to 224 x 224 RGB
-    |
-    v
-ImageNet normalization
-    |
-    v
-EfficientNet-B0 classifier
-    |
-    v
-One of 27 class predictions
+*An edge-oriented plant leaf disease analysis system combining YOLO-based leaf localization, EfficientNet-B0 classification, and Grad-CAM explainability.*
 
-## Project structure
+[![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![YOLO](https://img.shields.io/badge/YOLO-Object_Detection-111F68?style=flat-square)](https://docs.ultralytics.com/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-Deep_Learning-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![EfficientNet](https://img.shields.io/badge/EfficientNet-B0-4285F4?style=flat-square)](https://arxiv.org/abs/1905.11946)
+[![Flask](https://img.shields.io/badge/Flask-Web_App-000000?style=flat-square&logo=flask)](https://flask.palletsprojects.com/)
 
-- `training/01_train_yolo_detector.py`: YOLO detector training
-- `training/02_train_efficientnet_b0.py`: EfficientNet-B0 training
-- `training/03_evaluate_pipeline.py`: End-to-end evaluation
-- `training/04_export_onnx_fp16.py`: ONNX FP32 and FP16 export
-- `training/05_gradcam_explainability.py`: Grad-CAM visualization
-- `configs/class_order.json`: The 27-class label order
-- `configs/data.yaml`: YOLO dataset configuration
-- `webapp/`: Flask inference application and user interface
+</div>
 
-## Installation
+---
+
+## 🌱 Overview
+
+**PlantDoc Edge** is a deep learning-based plant leaf disease analysis system designed to recognize diseases from leaf images, including images captured under challenging real-world conditions.
+
+The system uses a two-stage pipeline: YOLO localizes the leaf, and EfficientNet-B0 classifies the cropped image into one of 27 plant-disease classes. Grad-CAM provides visual explanations of the classifier's predictions.
+
+## ✨ Features
+
+| Feature | Description |
+|---|---|
+| 🍃 **Leaf Localization** | Detects candidate leaf regions using YOLO |
+| 🔬 **Disease Classification** | Classifies leaf images into 27 disease classes using EfficientNet-B0 |
+| 🖼️ **Image Preprocessing** | Crops, resizes, and normalizes images before classification |
+| 🔎 **Explainable AI** | Uses Grad-CAM to visualize image regions influencing predictions |
+| ⚡ **Optimized Inference** | Exports models to ONNX and supports FP16 classifier weights |
+| 🌐 **Web Interface** | Flask-based inference application and user interface |
+| 📊 **Pipeline Evaluation** | Evaluates the complete localization and classification workflow |
+
+---
+
+## 🧠 Model Pipeline
+
+```text
+Input Leaf Image
+       |
+       v
+YOLO Leaf Localization
+       |
+       v
+Highest-Confidence Bounding Box
+       |
+       v
+Crop and Resize (224 × 224 RGB)
+       |
+       v
+ImageNet Normalization
+       |
+       v
+EfficientNet-B0 Classifier
+       |
+       v
+One of 27 Class Predictions
+       |
+       v
+Grad-CAM Visualization
+```
+
+Grad-CAM is used to interpret the classifier's prediction; it does not independently determine the predicted disease.
+
+---
+
+## 🛠️ Tech Stack
+
+```text
+Component             Technology
+────────────────────────────────────────
+Programming Language  Python
+Object Detection      YOLO
+Image Classification  EfficientNet-B0
+Deep Learning         PyTorch
+Model Optimization    ONNX, FP16
+Explainable AI        Grad-CAM
+Web Application       Flask
+Data Processing       Image preprocessing
+```
+
+---
+
+## 📊 Evaluation Results
+
+The recorded project validation results are shown below.
+
+| Metric | Result |
+|---|---:|
+| Validation Images | 262 |
+| End-to-End Accuracy | 71.76% |
+| Macro-F1 Score | 71.11% |
+| Disease Classes | 27 |
+
+These results represent the project's recorded validation evaluation. They are not an independent external benchmark or a guarantee that a retrained model will reproduce the same performance.
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Python installed
+- Git
+- A compatible environment for the project's dependencies
+- Dataset files and trained model weights, where required
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Tgovardhan2005/Research_Project.git
+cd Research_Project
+```
+
+### 2. Create a Virtual Environment
 
 ```bash
 python -m venv .venv
 ```
 
-Windows:
+**Windows:**
 
 ```cmd
 .venv\Scripts\activate
 ```
 
-Install dependencies:
+**Linux / macOS:**
+
+```bash
+source .venv/bin/activate
+```
+
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Dataset preparation
+Ensure that the required dependencies and compatible versions are specified in `requirements.txt`.
 
-Prepare the annotated YOLO dataset with train, validation, and test splits.
+---
 
-Prepare the classification dataset with one directory per class.
+## 🏋️ Training and Evaluation
 
-Keep the classification label order consistent with `configs/class_order.json`.
+Run the following commands from the repository root after preparing the datasets and configuring the required paths.
 
-Do not use the same images for training and independent testing.
-
-## Training
-
-Train the detector:
+### 1. Train the YOLO Detector
 
 ```bash
 python training/01_train_yolo_detector.py
 ```
 
-Train the classifier:
+Trains the detector to localize leaf regions.
+
+### 2. Train the EfficientNet-B0 Classifier
 
 ```bash
 python training/02_train_efficientnet_b0.py
 ```
 
-Evaluate the pipeline:
+Trains the image classifier using the prepared classification dataset.
+
+### 3. Evaluate the Complete Pipeline
 
 ```bash
 python training/03_evaluate_pipeline.py
 ```
 
-Export ONNX models:
+Evaluates end-to-end disease recognition performance.
+
+### 4. Export ONNX Models
 
 ```bash
 python training/04_export_onnx_fp16.py
 ```
 
-Generate Grad-CAM:
+Exports the models in ONNX format, including the FP16 classifier variant.
+
+### 5. Generate Grad-CAM Explanations
 
 ```bash
 python training/05_gradcam_explainability.py
 ```
 
-## Evaluation configuration
+Generates visual explanations highlighting image regions relevant to classifier predictions.
 
-The final deployment pipeline uses:
+---
 
-- YOLO input size: 640
-- YOLO confidence threshold: 0.25
-- Bounding box: highest-confidence detection
-- Classifier input: 224 x 224 RGB
-- Classifier: EfficientNet-B0
-- Class count: 27
-- Deployment classifier: FP16-weight ONNX
+## ⚙️ Inference Configuration
 
-The project validation results previously recorded were approximately 71.76% end-to-end accuracy and 71.11% macro-F1 on 262 validation images. These are project validation results, not an independent external benchmark or a guarantee that a newly trained model will reproduce them.
+| Parameter | Configuration |
+|---|---|
+| YOLO Input Size | 640 |
+| YOLO Confidence Threshold | 0.25 |
+| Bounding Box Selection | Highest-confidence detection |
+| Classifier Input Size | 224 × 224 |
+| Image Format | RGB |
+| Classifier | EfficientNet-B0 |
+| Number of Classes | 27 |
+| Deployment Classifier | FP16-weight ONNX |
 
-## Limitations
+---
 
-- The classifier does not have a dedicated healthy-leaf class in its current 27-class label set.
+## 📁 Project Structure
+
+```text
+Research_Project/
+├── training/
+│   ├── 01_train_yolo_detector.py
+│   ├── 02_train_efficientnet_b0.py
+│   ├── 03_evaluate_pipeline.py
+│   ├── 04_export_onnx_fp16.py
+│   └── 05_gradcam_explainability.py
+│
+├── configs/
+│   ├── class_order.json
+│   └── data.yaml
+│
+├── webapp/
+│   └── Flask inference application and UI
+│
+├── requirements.txt
+└── README.md
+```
+
+The structure above summarizes the documented project files. Additional application files, model artifacts, and datasets may be present in the repository.
+
+---
+
+## ⚠️ Limitations
+
+- The current 27-class label set does not include a dedicated healthy-leaf class.
 - Confidence thresholds alone cannot guarantee rejection of unrelated images.
-- Edge-device latency and power consumption require measurements on actual target hardware.
-- The provided training scripts are reusable implementations and may require adjustment to reproduce the original experiment exactly.
+- Real-world performance may vary with lighting, background clutter, and image quality.
+- Edge-device latency and power consumption have not been established without measurements on the target hardware.
+- Reproducing the recorded results may require the original datasets, model weights, configuration, and training environment.
 
-## Model files
+---
 
-Large model weights and datasets are not committed to this repository. Provide separate download instructions for authorized model artifacts.
+## 📦 Model Weights and Datasets
 
-## License
+Large model weights and datasets are not committed to the repository. Follow the project's authorized artifact download instructions to obtain the required files.
 
-Add the license appropriate for your code and datasets before publishing.
+Before publishing, verify that the datasets and pretrained weights can be redistributed under their respective licenses.
+
+---
+
+## 🔮 Future Improvements
+
+- Add healthy-leaf recognition and out-of-distribution image rejection.
+- Evaluate generalization on independent field datasets.
+- Measure inference latency and memory usage on edge devices.
+- Improve prediction explanations and confidence calibration.
+- Optimize the complete inference pipeline for deployment.
+
+---
+
+## 📄 License
+
+Add an appropriate license for the source code and verify the licensing terms of the datasets and pretrained models before distribution.
+
+---
+
+<div align="center">
+
+Developed by **Govardhan T**
+
+*Making plant disease analysis more interpretable and deployment-oriented.*
+
+</div>
